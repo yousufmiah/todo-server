@@ -1,25 +1,5 @@
-
-basic part1==============
-const express = require('express')
-const app = express()
-const port = 3000
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
-
-====================basic end===========
-
-
-=====================================
-================full setup===============
 const express = require("express");
 const cors = require("cors");
-
 require("dotenv").config();
 //connection
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -32,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 //connection
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.asff6.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.3uem3.mongodb.net/?retryWrites=true&w=majority`;
+
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -45,14 +26,27 @@ async function run() {
     await client.connect();
 
     //itemsCollection=============
-    const itemsCollection = client.db("tools_manufacturer").collection("items");
+    const itemsCollection = client.db("todo").collection("list");
 
-    // //=for payment for order==========
-    app.get("/orders", async (req, res) => {
+    //get all items
+    app.get("/items", async (req, res) => {
+      const query = {};
+      const items = await itemsCollection.find(query).toArray();
+      res.send(items);
+    });
+
+    //post data
+    app.post("/item", async (req, res) => {
+      const newItem = req.body;
+      const result = await itemsCollection.insertOne(newItem);
+      res.send(result);
+    });
+    //delete data
+    app.delete("/items/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: id };
-      const order = await itemsCollection.findOne(query);
-      res.send(order);
+      const query = { _id: ObjectId(id) };
+      const result = await itemsCollection.deleteOne(query);
+      res.send(result);
     });
   } finally {
   }
@@ -63,7 +57,7 @@ console.log("all route ok");
 
 //root api
 app.get("/", (req, res) => {
-  res.send("Running Tools manufacturer Server.");
+  res.send("Running Todo Server.");
 });
 
 //heroku
@@ -72,5 +66,5 @@ app.get("/hero", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("Tools manufacturer Listening to port", port);
+  console.log("Todo Listening to port", port);
 });
