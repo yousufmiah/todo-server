@@ -60,10 +60,10 @@ app.get("/", (req, res) => {
   res.send("Running Todo Server.");
 });
 
-//heroku
-app.get("/hero", (req, res) => {
-  res.send("Meet with heroku");
-});
+// //heroku
+// app.get("/hero", (req, res) => {
+//   res.send("Meet with heroku");
+// });
 
 app.listen(port, () => {
   console.log("Todo Listening to port", port);
